@@ -1,0 +1,218 @@
+\documentclass[10pt, aspectratio=169]{beamer}
+\usetheme[font=arial, elevatedtitles=false]{NMBU}
+
+% use elevatedtitles=true to move the titles up
+\usefonttheme[onlymath]{serif} % Remove this if you want arial math
+
+\usepackage{lmodern}
+
+% Arial font with XeLaTeX or LuaLaTeX
+\usepackage{fontspec}
+\setsansfont{Arial}
+\setmainfont{Arial}
+
+% Math & units
+\usepackage{amsmath, amssymb}
+\usepackage{siunitx}
+\sisetup{per-mode=symbol,detect-all=true}
+
+% Graphics & layout
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true}
+
+% Title data
+
+% Title page and metadata
+\title{FYSXXX Course Title}
+\subtitle{Chapter Y - Chapter Title}
+\author{Your Name}
+\institute{Norwegian University of Life Sciences}
+\date{\today}
+
+\begin{document}
+
+%========================
+\begin{frame}[plain, noframenumbering]  %make sure to have plain and noframenumbering here
+  \titlepage
+\end{frame}
+
+%========================
+\section*{Overview}
+\begin{frame}{How to use this file}
+\begin{itemize}
+  \item This is a \emph{generic} starter deck showing common slide layouts.
+  \item Replace placeholder text and shapes with your own content.
+  \item Compile with \textbf{XeLaTeX} or \textbf{LuaLaTeX} to use the theme's font settings.
+  \item Keep this file in the same folder as \texttt{beamerthemeNMBU.sty}.
+\end{itemize}
+\end{frame}
+
+%========================
+\section{Single-column text}
+\begin{frame}{Single-column text}
+This slide demonstrates a simple text layout. Paragraphs are set for readability on large screens. Use concise sentences and limit the number of bullets per slide to keep attention on key points.
+
+Inline math like $a^2+b^2=c^2$ and short expressions $x \in \mathbb{R}$ render clearly. Hyperlinks are legible yet unobtrusive: \url{https://example.org}.
+\end{frame}
+
+%========================
+\section{Two-column layout}
+\begin{frame}{Two-column layout}
+\begin{columns}[T,onlytextwidth]
+  \column{0.52\textwidth}
+  \textbf{Left column}
+  \begin{itemize}
+    \item Use columns for comparisons, pros/cons, or text vs. figures.
+    \item Keep lists short; split across slides rather than shrinking fonts.
+    \item Use blocks for emphasis (see next slides).
+  \end{itemize}
+
+  \column{0.44\textwidth}
+  \textbf{Right column}
+  \begin{itemize}
+    \item Why not more text?
+    \item I'm sure by now you are not reading this
+  \end{itemize}
+\end{columns}
+\end{frame}
+
+%========================
+\section{Text + figure side-by-side}
+\begin{frame}{Text with figure}
+\begin{columns}[T,onlytextwidth]
+  \column{0.58\textwidth}
+  \textbf{Guidelines}
+  \begin{enumerate}
+    \item Introduce the figure in one or two sentences.
+    \item Reference key features or trends your audience should notice.
+    \item Conclude with the implication or takeaway.
+  \end{enumerate}
+
+  Example sentence with units using \texttt{siunitx}: ``The device length was \SI{120}{mm} and the sampling rate was \SI{10}{kHz}.''
+
+  \column{0.38\textwidth}
+  \begin{center}
+    % Replace with your image
+    % \includegraphics[width=\linewidth]{path/to/image}
+    \begin{tikzpicture}
+      \draw[NMBUAccent3,dashed,fill=NMBUAccent3!12] (0,0) rectangle (5,4);
+      \node at (2.5,2) {Image Placeholder};
+    \end{tikzpicture}
+  \end{center}
+\end{columns}
+\end{frame}
+
+%========================
+\section{Blocks and emphasis}
+\begin{frame}{Blocks and emphasis}
+\begin{block}{Key point}
+Use a standard block for definitions, main ideas, or neutral emphasis.
+\end{block}
+
+\begin{alertblock}{Caution}
+Use an alert block for warnings, limitations, or important exceptions.
+\end{alertblock}
+
+\begin{exampleblock}{Example}
+Use an example block for worked examples, case studies, or brief demonstrations.
+\end{exampleblock}
+\end{frame}
+
+%========================
+\section{Math and units}
+\begin{frame}{Equations and units}
+\begin{align}
+  f(x) &= ax^2 + bx + c, \\
+  x_{1,2} &= \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}. \label{eq:quadratic}
+\end{align}
+Use \texttt{siunitx} for consistent numbers and units: \SI{3.1416}{rad}, \SI{9.81}{m/s^2}, \SI{2.4}{GHz}.
+\end{frame}
+
+%========================
+\section{Tables}
+\begin{frame}{Compact table}
+\begin{table}
+  \centering
+  \small
+  \begin{tabular}{@{}lcc@{}}
+    \toprule
+    Item & Quantity & Note \\
+    \midrule
+    Alpha & \num{42} & Example entry \\
+    Beta & \num{7} & Another entry \\
+    Gamma & \num{13} & One more \\
+    \bottomrule
+  \end{tabular}
+  \caption{Compact table using \texttt{booktabs}.}
+\end{table}
+\end{frame}
+
+%========================
+\section{Lists}
+\begin{frame}{Lists}
+\begin{columns}[T,onlytextwidth]
+  \column{0.48\textwidth}
+  \textbf{Bulleted list}
+  \begin{itemize}
+    \item First point
+    \item Second point
+    \item Third point
+  \end{itemize}
+
+  \column{0.48\textwidth}
+  \textbf{Numbered list}
+  \begin{enumerate}
+    \item Step one
+    \item Step two
+    \item Step three
+  \end{enumerate}
+\end{columns}
+\end{frame}
+
+%========================
+\section{Figure slide}
+\begin{frame}{Full-width figure}
+\begin{figure}
+  \centering
+  % \includegraphics[width=.9\linewidth]{path/to/figure}
+  \setlength{\fboxsep}{0pt}%
+  \fbox{\rule{0pt}{5cm}\rule{.9\linewidth}{0pt}}
+  \caption{Insert a high-resolution figure with a concise caption.}
+\end{figure}
+\end{frame}
+
+%========================
+\section{Quotations}
+\begin{frame}{Quotation}
+\begin{quote}
+“Concise quotations can provide context or motivation. Keep them short and readable.”
+\end{quote}
+\end{frame}
+
+%========================
+\section{Wrap-up}
+\begin{frame}{Takeaways}
+\begin{itemize}
+  \item One message per slide; visuals over text walls.
+  \item Use blocks for emphasis; keep tables compact.
+  \item Prefer multiple simple slides to one overloaded slide.
+\end{itemize}
+\end{frame}
+
+%========================
+\begin{frame}
+  \centering\LARGE Questions?
+\end{frame}
+
+%========================
+\appendix
+
+\section{Backup}
+\begin{frame}{Extra slides}
+Add additional material here for Q\&A or reference.
+\end{frame}
+
+\end{document}

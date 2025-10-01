@@ -1,0 +1,171 @@
+% NMBU Beamer style
+% 
+% (c) Leonardo Rydin Gorjão 2025
+%
+%% This style can be redistributed and/or modified freely.
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{beamerthemeNMBU}[2025/10/01 v0.1 NMBU Beamer theme]
+
+\RequirePackage{xcolor}
+\RequirePackage{etoolbox}
+\RequirePackage{ifxetex}
+\RequirePackage{ifluatex}
+
+\RequirePackage{tikz}
+\usetikzlibrary{calc}
+\usetikzlibrary{intersections}
+\usetikzlibrary{positioning}
+
+\SetupKeyvalOptions{family=NMBU, prefix=NMBU@}
+\DeclareStringOption[arial]{font}     % arial|calibri|none (none = don't touch fonts)
+\DeclareBoolOption[true]{elevatedtitles}
+\DeclareBoolOption[true]{sectionframe} % show section title slides with primary background
+\DeclareBoolOption[true]{barframetitle} % colored frametitle bar
+\DeclareBoolOption[true]{tightlists}   % slightly tighter item spacing
+\ProcessKeyvalOptions*
+
+
+\definecolor{NMBUblack}{HTML}{000000}      % Black 
+\definecolor{NMBUwhite}{HTML}{FFFFFF}    % White 
+\definecolor{NMBUPrimary}{HTML}{009D7F}  % accent1 (green/teal)
+\definecolor{NMBUAccent2}{HTML}{E7E3D1}  % accent2 (amber)
+\definecolor{NMBUAccent3}{HTML}{F6F6EE}  % accent3 (slate)
+
+% I note here that the official green of NMBU is the {RGB}{0,133,113}, but for some reason, all the templates we use, use a different green. Beats me.
+
+% Font setup (Arial by default as per NMBU standard)
+\newif\ifnmbu@fontspec
+\ifxetex\nmbu@fontspectrue\fi
+\ifluatex\nmbu@fontspectrue\fi
+
+\ifstrequal{\NMBU@font}{none}{\nmbu@fontspecfalse}{}%
+
+\ifnmbu@fontspec
+  \RequirePackage{fontspec}
+  \ifstrequal{\NMBU@font}{calibri}{%
+    \setsansfont{Calibri}
+    \setmainfont{Calibri}
+  }{%
+    % default Arial
+    \setsansfont{Arial}
+    \setmainfont{Arial}
+  }%
+  \setmonofont{Inconsolata}
+\else
+  % pdfLaTeX fallback: use Helvetica for a similar look
+  \RequirePackage[scaled=0.92]{helvet}
+  \renewcommand{\familydefault}{\sfdefault}
+\fi
+
+\def\elevatedtitleheight{6.2ex}
+\ifNMBU@elevatedtitles 
+    \renewcommand\elevatedtitleheight{3.0ex}
+\fi
+
+\setlength{\abovecaptionskip}{5pt plus 3pt minus 2pt}
+% Core beamer palette & typography
+\mode<presentation>
+
+% Base text & structure
+\setbeamercolor{normal text}{fg=NMBUblack,bg=NMBUwhite}
+\setbeamercolor{structure}{fg=NMBUPrimary}
+\setbeamercolor{alerted text}{fg=NMBUAccent2}
+
+% Frame title bar (colored) and title colors
+\ifNMBU@barframetitle
+  \setbeamercolor{frametitle}{fg=NMBUPrimary,bg=}
+  \setbeamertemplate{frametitle}{%
+    \nointerlineskip
+    \begin{beamercolorbox}[wd=\paperwidth,ht=\elevatedtitleheight,dp=1.6ex,leftskip=10mm,rightskip=10mm]{frametitle}
+      \usebeamerfont{frametitle}\insertframetitle
+    \end{beamercolorbox}%
+  }
+\else
+  \setbeamercolor{frametitle}{fg=NMBUPrimary,bg=}
+\fi
+\setbeamerfont{frametitle}{size=\Large}
+\setbeamerfont{title}{size=\huge}
+\setbeamerfont{subtitle}{size=\large}
+\setbeamerfont{author}{size=\large}
+\setbeamerfont{institute}{size=\large}
+\setbeamerfont{date}{size=\large}
+\setbeamerfont{block title}{size=\normalsize}
+\setbeamerfont{footnote}{size=\scriptsize}
+
+% Margins & vertical rhythm
+\setbeamersize{text margin left=10mm, text margin right=10mm}
+\linespread{1.06}
+\setlength{\parskip}{0.28\baselineskip}
+
+% Lists
+\setbeamercolor{itemize item}{fg=NMBUPrimary}
+\setbeamercolor{itemize subitem}{fg=NMBUAccent3}
+\setbeamertemplate{itemize item}{\raise0.6pt\hbox{\large\textbullet}}
+\setbeamertemplate{itemize subitem}{\textendash}
+\ifNMBU@tightlists
+  \setlength{\leftmargini}{1.4em}
+  \setlength{\itemsep}{0.25\baselineskip}
+\fi
+
+% Blocks (use amber/secondary accent for titles, light background for body)
+\setbeamertemplate{blocks}[rounded][shadow=false]
+\setbeamercolor{block title}{fg=NMBUblack,bg=NMBUAccent2}
+\setbeamercolor{block body}{fg=NMBUblack,bg=NMBUAccent3}
+\setbeamercolor{block title example}{fg=NMBUblack,bg=NMBUAccent2}
+\setbeamercolor{block body example}{fg=NMBUblack,bg=NMBUAccent3}
+\setbeamercolor{block title alerted}{fg=NMBUblack,bg=NMBUAccent2}
+\setbeamercolor{block body alerted}{fg=NMBUblack,bg=NMBUAccent3}
+
+
+% Example/theorem colors (cooler palette)
+\setbeamercolor{author in head/foot}{fg=NMBUPrimary,bg=}
+\setbeamercolor{date in head/foot}{fg=NMBUPrimary,bg=}
+\setbeamercolor{nmbu foot rule}{fg=NMBUPrimary,bg=}
+
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{caption}[numbered]
+
+% Footline: rule + page (left) and NMBU (right)
+\setbeamertemplate{footline}{%
+\begin{tikzpicture}[overlay, remember picture]
+    \node[below right, inner sep=0pt] at ($(current page.north east)+(-2, -0.25)$) {\enlogo{NMBUPrimary}};
+    \draw[line width=0.12mm, NMBUPrimary, inner sep=0pt] ($(current page.south west)+(0.9, 0.8)$) -- ($(current page.south east)+(-0.9, 0.8)$);
+    \node[below right, NMBUPrimary, inner sep=0pt] at ($(current page.south west)+(0.9, 0.7)$) {\fontsize{5.5pt}{6.5pt}\selectfont\insertframenumber\par};
+    \node[below left, NMBUPrimary, inner sep=0pt] at ($(current page.south east)+(-0.9, 0.7)$) {\fontsize{5.7pt}{6.5pt}\selectfont\insertinstitute\par};
+\end{tikzpicture}
+}
+
+% Title page with primary background, white text
+\setbeamercolor{title}{fg=NMBUwhite,bg=NMBUPrimary}
+\defbeamertemplate*{title page}{nmbu}[1][]{%
+\begin{tikzpicture}[overlay, remember picture]
+    \fill [NMBUPrimary, inner sep=0pt] ($(current page.north west)$) -- ($(current page.north east)$) -- ($(current page.south east)$) -- ($(current page.south west)$) -- ($(current page.north west)$);
+    \node[below right, NMBUPrimary, inner sep=0pt] at ($(current page.north east)+(-2, -0.25)$) {\resizebox{0.1cm}{!}{\enlogo{NMBUwhite}}};
+    \node[right, NMBUwhite, inner sep=0pt] at ($(current page.west) + (0.9,0.3)$) {\fontsize{23pt}{26pt}\selectfont\inserttitle\par};
+    \node[right, NMBUwhite, inner sep=0pt] at ($(current page.west) + (0.9,-0.5)$) {\fontsize{12pt}{14pt}\selectfont\insertauthor\par};
+    \node[right, NMBUwhite, inner sep=0pt] at ($(current page.west) + (0.9,-1.7)$) {\fontsize{12pt}{14pt}\selectfont\insertsubtitle\par};
+    \node[right, NMBUwhite, inner sep=0pt] at ($(current page.west) + (0.9,-2.3)$) {\fontsize{12pt}{14pt}\selectfont\insertdate\par};
+    \draw[line width=0.12mm, NMBUwhite, inner sep=0pt] ($(current page.south west)+(0.9, 0.8)$) -- ($(current page.south east)+(-0.9, 0.8)$);
+    \node[below left, NMBUwhite, inner sep=0pt] at ($(current page.south east)+(-0.9, 0.7)$) {\fontsize{5.7pt}{6.5pt}\selectfont\insertinstitute\par};
+\end{tikzpicture}
+}
+
+\setbeamertemplate{title page}[nmbu]
+
+\renewcommand\footnoterule{}
+\setbeamertemplate{footnote}{%
+% \begin{tikzpicture}[overlay, remember picture]
+%     \node[below left, inner sep=0pt] at ($(current page.south east)+(-0.9, 1.15)$) {{\tiny\hbox to 1.8em{\hfil\insertfootnotemark}\insertfootnotetext\par}};
+% \end{tikzpicture}
+  \raggedleft%\raggedright
+  \usebeamercolor{footnote}\tiny\hfil\insertfootnotemark \insertfootnotetext\par%
+}
+
+\addtobeamertemplate{footline}{}{\vspace{0.75cm}} 
+
+\newcommand{\enlogo}[1]{%
+\begin{tikzpicture}[scale=2,remember picture,overlay]% 
+  \path[fill=#1] (0.1418, -0.4077) -- (0.1588, -0.4077) -- (0.1588, -0.4847) -- (0.1421, -0.4847) -- (0.1135, -0.4392) -- (0.1135, -0.4847) -- (0.0963, -0.4847) -- (0.0963, -0.4077) -- (0.1135, -0.4077) -- (0.1418, -0.4524) -- (0.1418, -0.4077) -- cycle(0.2979, -0.4059) -- (0.2979, -0.3289) -- (0.2775, -0.3289) -- (0.2596, -0.3773) -- (0.2418, -0.3289) -- (0.2207, -0.3289) -- (0.2207, -0.4059) -- (0.2376, -0.4059) -- (0.2376, -0.3622) -- (0.2532, -0.4048) -- (0.2656, -0.4048) -- (0.2813, -0.3627) -- (0.2813, -0.4059) -- (0.2979, -0.4059) -- cycle(0.508, -0.1408) -- (0.508, -0.1876).. controls (0.508, -0.1947) and (0.5056, -0.2032) .. (0.4945, -0.2032).. controls (0.4834, -0.2032) and (0.481, -0.1947) .. (0.481, -0.1876) -- (0.481, -0.1408) -- (0.4638, -0.1408) -- (0.4638, -0.1879).. controls (0.4638, -0.2072) and (0.4755, -0.2193) .. (0.4945, -0.2193).. controls (0.5138, -0.2193) and (0.5252, -0.2077) .. (0.5252, -0.1879) -- (0.5252, -0.1408) -- (0.508, -0.1408) -- cycle(0.3937, -0.2574).. controls (0.399, -0.2611) and (0.4022, -0.2672) .. (0.4022, -0.2741).. controls (0.4022, -0.2818) and (0.3993, -0.2879) .. (0.394, -0.2921).. controls (0.3879, -0.2969) and (0.3805, -0.2974) .. (0.3733, -0.2974) -- (0.3424, -0.2974) -- (0.3424, -0.2201) -- (0.3733, -0.2201).. controls (0.381, -0.2201) and (0.3868, -0.2215) .. (0.3913, -0.2244).. controls (0.3971, -0.2281) and (0.4006, -0.235) .. (0.4006, -0.2418).. controls (0.4008, -0.2471) and (0.3987, -0.2537) .. (0.3937, -0.2574) -- cycle(0.3596, -0.25) -- (0.3744, -0.25).. controls (0.3826, -0.25) and (0.3834, -0.2461) .. (0.3834, -0.2429).. controls (0.3834, -0.2381) and (0.3802, -0.2355) .. (0.3741, -0.2355) -- (0.3596, -0.2355) -- (0.3596, -0.25) -- cycle(0.3847, -0.2738).. controls (0.3847, -0.2717) and (0.3847, -0.2651) .. (0.3741, -0.2651) -- (0.3593, -0.2651) -- (0.3593, -0.2815) -- (0.3739, -0.2815).. controls (0.3781, -0.2815) and (0.3847, -0.2805) .. (0.3847, -0.2738) -- cycle(0.4683, -0.3596) -- (0.3765, -0.3596) -- (0.3765, -0.3289) -- (0.3598, -0.3289) -- (0.3598, -0.3596) -- (0.3291, -0.3596) -- (0.3291, -0.3762) -- (0.3598, -0.3762) -- (0.3598, -0.468) -- (0.1961, -0.468) -- (0.1961, -0.4847) -- (0.3702, -0.4847).. controls (0.3736, -0.4847) and (0.3765, -0.4818) .. (0.3765, -0.4784) -- (0.3765, -0.3762) -- (0.4786, -0.3762).. controls (0.4821, -0.3762) and (0.485, -0.3733) .. (0.485, -0.3699) -- (0.485, -0.2471) -- (0.4683, -0.2471) -- (0.4683, -0.3596) -- cycle(0.2503, -0.2974) -- (0.267, -0.2974) -- (0.267, -0.2664) -- (0.2979, -0.2664) -- (0.2979, -0.2498) -- (0.267, -0.2498) -- (0.267, -0.158) -- (0.4265, -0.158) -- (0.4265, -0.1413) -- (0.2566, -0.1413).. controls (0.2532, -0.1413) and (0.2503, -0.1442) .. (0.2503, -0.1476) -- (0.2503, -0.2498) -- (0.1482, -0.2498).. controls (0.1447, -0.2498) and (0.1418, -0.2527) .. (0.1418, -0.2561) -- (0.1418, -0.3762) -- (0.1585, -0.3762) -- (0.1585, -0.2664) -- (0.2503, -0.2664) -- (0.2503, -0.2974) -- cycle;
+\end{tikzpicture}
+}
