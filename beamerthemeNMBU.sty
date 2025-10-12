@@ -5,9 +5,10 @@
 %% This style can be redistributed and/or modified freely.
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{beamerthemeNMBU}[2025/10/01 v0.1 NMBU Beamer theme]
+\ProvidesPackage{beamerthemeNMBU}[2025/10/12 v0.2 NMBU Beamer theme]
 
 \RequirePackage{xcolor}
+\RequirePackage{graphicx}
 \RequirePackage{etoolbox}
 \RequirePackage{ifxetex}
 \RequirePackage{ifluatex}
@@ -20,19 +21,43 @@
 \SetupKeyvalOptions{family=NMBU, prefix=NMBU@}
 \DeclareStringOption[arial]{font}     % arial|calibri|none (none = don't touch fonts)
 \DeclareBoolOption[true]{elevatedtitles}
-\DeclareBoolOption[true]{sectionframe} % show section title slides with primary background
-\DeclareBoolOption[true]{barframetitle} % colored frametitle bar
+\DeclareBoolOption[true]{serifmath}
 \DeclareBoolOption[true]{tightlists}   % slightly tighter item spacing
+% Three language switch: en (English), bm (Bokmål), nn (Nynorsk)
+\DeclareStringOption[en]{lang}
 \ProcessKeyvalOptions*
 
+% Mapping to babel/polyglossia language tags 
+\def\NMBU@babel@en{english}
+\def\NMBU@babel@bm{norwegian} % Bokmål
+\def\NMBU@babel@nn{nynorsk}
+\newcommand*\NMBU@babelname{\csname NMBU@babel@\NMBU@lang\endcsname}
 
-\definecolor{NMBUblack}{HTML}{000000}      % Black 
+% Load babel
+\expandafter\RequirePackage\expandafter[\NMBU@babelname]{babel}
+
+% Define institutional name for the three languages
+\providecommand\NMBU@inst@en{Norwegian University of Life Sciences}
+\providecommand\NMBU@inst@bm{Norges miljø- og biovitenskapelige universitet}
+\providecommand\NMBU@inst@nn{Noregs miljø- og biovitskaplege universitet}
+
+\newcommand*\NMBU@InstituteName{\csname NMBU@inst@\NMBU@lang\endcsname}
+\institute{\NMBU@InstituteName}
+
+
+% Colour definitions. More should be added.
+\definecolor{NMBUblack}{HTML}{000000}    % Black 
 \definecolor{NMBUwhite}{HTML}{FFFFFF}    % White 
 \definecolor{NMBUPrimary}{HTML}{009D7F}  % accent1 (green/teal)
 \definecolor{NMBUAccent2}{HTML}{E7E3D1}  % accent2 (amber)
 \definecolor{NMBUAccent3}{HTML}{F6F6EE}  % accent3 (slate)
+% I note here that the official green of NMBU is the {RGB}{0,133,113}, but for some reason, all the templates we use use a different green. Beats me.
 
-% I note here that the official green of NMBU is the {RGB}{0,133,113}, but for some reason, all the templates we use, use a different green. Beats me.
+% Hyperlinks related packages
+\RequirePackage{hyperref}
+\hypersetup{colorlinks=true,citecolor=NMBUPrimary}
+\urlstyle{same}
+\DeclareUrlCommand\url{\color{NMBUPrimary}}
 
 % Font setup (Arial by default as per NMBU standard)
 \newif\ifnmbu@fontspec
@@ -51,7 +76,6 @@
     \setsansfont{Arial}
     \setmainfont{Arial}
   }%
-  \setmonofont{Inconsolata}
 \else
   % pdfLaTeX fallback: use Helvetica for a similar look
   \RequirePackage[scaled=0.92]{helvet}
@@ -63,7 +87,20 @@
     \renewcommand\elevatedtitleheight{3.0ex}
 \fi
 
+\ifNMBU@serifmath 
+    \usefonttheme[onlymath]{serif}
+\fi
+
+\RequirePackage{lmodern}
+
+% Arial font with XeLaTeX or LuaLaTeX
+\RequirePackage{fontspec}
+\setsansfont{Arial}
+\setmainfont{Arial}
+
+% Shorter caption spacing
 \setlength{\abovecaptionskip}{5pt plus 3pt minus 2pt}
+
 % Core beamer palette & typography
 \mode<presentation>
 
@@ -73,18 +110,19 @@
 \setbeamercolor{alerted text}{fg=NMBUAccent2}
 
 % Frame title bar (colored) and title colors
-\ifNMBU@barframetitle
-  \setbeamercolor{frametitle}{fg=NMBUPrimary,bg=}
-  \setbeamertemplate{frametitle}{%
+\setbeamercolor{frametitle}{fg=NMBUPrimary,bg=}
+\setbeamertemplate{frametitle}{%
     \nointerlineskip
     \begin{beamercolorbox}[wd=\paperwidth,ht=\elevatedtitleheight,dp=1.6ex,leftskip=10mm,rightskip=10mm]{frametitle}
-      \usebeamerfont{frametitle}\insertframetitle
+      \usebeamerfont{frametitle}\insertframetitle\\[0.1em]
+      \usebeamerfont{framesubtitle}\insertframesubtitle
     \end{beamercolorbox}%
-  }
-\else
-  \setbeamercolor{frametitle}{fg=NMBUPrimary,bg=}
-\fi
+}
+
+
 \setbeamerfont{frametitle}{size=\Large}
+\setbeamerfont{framesubtitle}{size=\normalsize}
+
 \setbeamerfont{title}{size=\huge}
 \setbeamerfont{subtitle}{size=\large}
 \setbeamerfont{author}{size=\large}

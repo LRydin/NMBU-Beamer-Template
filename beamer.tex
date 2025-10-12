@@ -1,35 +1,24 @@
 \documentclass[10pt, aspectratio=169]{beamer}
-\usetheme[font=arial, elevatedtitles=false]{NMBU}
+\usetheme[lang=en, font=arial, elevatedtitles=false, serifmath=true]{NMBU}
 
-% use elevatedtitles=true to move the titles up
-\usefonttheme[onlymath]{serif} % Remove this if you want arial math
-
-\usepackage{lmodern}
-
-% Arial font with XeLaTeX or LuaLaTeX
-\usepackage{fontspec}
-\setsansfont{Arial}
-\setmainfont{Arial}
+% Use 'lang=...' to set the language: en (English), bm (Bokmål), nn (Nynorsk)
+% Keep 'font=arial' as this is the standard for NMBU
+% Use 'elevatedtitles=true' to move the titles up
+% Use 'serifmath=false' for Arial math (not the usual LaTeX math)
 
 % Math & units
 \usepackage{amsmath, amssymb}
-\usepackage{siunitx}
-\sisetup{per-mode=symbol,detect-all=true}
+\usepackage[per-mode=symbol]{siunitx}
 
-% Graphics & layout
-\usepackage{graphicx}
-\usepackage{xcolor}
+% Better tables
 \usepackage{booktabs}
-\usepackage{hyperref}
-\hypersetup{colorlinks=true}
 
 % Title data
-
 % Title page and metadata
 \title{FYSXXX Course Title}
 \subtitle{Chapter Y - Chapter Title}
 \author{Your Name}
-\institute{Norwegian University of Life Sciences}
+%\institute{Norwegian University of Life Sciences}
 \date{\today}
 
 \begin{document}
@@ -41,11 +30,11 @@
 
 %========================
 \section*{Overview}
-\begin{frame}{How to use this file}
+\begin{frame}{How to use this style}{And a few short examples}
 \begin{itemize}
   \item This is a \emph{generic} starter deck showing common slide layouts.
   \item Replace placeholder text and shapes with your own content.
-  \item Compile with \textbf{XeLaTeX} or \textbf{LuaLaTeX} to use the theme's font settings.
+  \item Compile with \textbf{XeLaTeX} or \textbf{LuaLaTeX} to use the theme's Arial font settings (in Overleaf you can set this in the \textit{File} \(\to\) \textit{Settings} \(\to\) \textit{Compiler}).
   \item Keep this file in the same folder as \texttt{beamerthemeNMBU.sty}.
 \end{itemize}
 \end{frame}
@@ -53,9 +42,34 @@
 %========================
 \section{Single-column text}
 \begin{frame}{Single-column text}
-This slide demonstrates a simple text layout. Paragraphs are set for readability on large screens. Use concise sentences and limit the number of bullets per slide to keep attention on key points.
+This slide demonstrates a simple text layout.
+Paragraphs are set for readability on large screens.
+Use concise sentences and limit the number of bullets per slide to keep attention on key points.
 
-Inline math like $a^2+b^2=c^2$ and short expressions $x \in \mathbb{R}$ render clearly. Hyperlinks are legible yet unobtrusive: \url{https://example.org}.
+Inline math like \(a^2+b^2=c^2\) and short expressions \(x \in \mathbb{R}\) render clearly.
+If you prefer the math typesetting to be in Arial, change the \texttt{documentclass} option '\texttt{serifmath=false}'.
+
+
+Hyperlinks or URLs: \url{https://example.org}.
+\end{frame}
+
+%========================
+\section{Frame titles}
+\begin{frame}[fragile=singleslide]{Frame titles}{And subtitles}
+
+\begin{itemize}
+    \item a \texttt{frame title} can be added in two manners: 
+    \begin{itemize} 
+       \item directly to the frame after the \verb|\begin{frame}| as \verb|\begin{frame}{Frame title}|.
+       \item using the \verb|\frametitle{Frame title}| option after \verb|\begin{frame}|.
+    \end{itemize}
+    \item a \texttt{frame subtitle} can be added in two manners: 
+    \begin{itemize} 
+       \item directly to the frame after the \verb|\begin{frame}{Frame title}| as \verb|\begin{frame}{Frame title}{Frame subtitle}|.
+       \item using the \verb|\framesubtitle{Frame subtitle}| option after \verb|\begin{frame}| and usually after the frame title.
+    \end{itemize}
+\end{itemize}
+
 \end{frame}
 
 %========================
@@ -208,7 +222,6 @@ Use \texttt{siunitx} for consistent numbers and units: \SI{3.1416}{rad}, \SI{9.8
 \end{frame}
 
 %========================
-\appendix
 
 \section{Backup}
 \begin{frame}{Extra slides}
