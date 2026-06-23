@@ -16,7 +16,7 @@
 % Title data
 % Title page and metadata
 \title{FYSXXX Course Title}
-\subtitle{Chapter Y - Chapter Title}
+\subtitle{Chapter Y -- Chapter Title}
 \author{Your Name}
 %\institute{Norwegian University of Life Sciences}
 \date{\today}
@@ -30,7 +30,7 @@
 
 %========================
 \section*{Overview}
-\begin{frame}{How to use this style}{And a few short examples}
+\begin{frame}[t]{How to use this style}{And a few short examples}
 \begin{itemize}
   \item This is a \emph{generic} starter deck showing common slide layouts.
   \item Replace placeholder text and shapes with your own content.
@@ -41,7 +41,7 @@
 
 %========================
 \section{Single-column text}
-\begin{frame}{Single-column text}
+\begin{frame}[t,leftlogo]{Single-column text}
 This slide demonstrates a simple text layout.
 Paragraphs are set for readability on large screens.
 Use concise sentences and limit the number of bullets per slide to keep attention on key points.
@@ -60,12 +60,12 @@ Hyperlinks or URLs: \url{https://example.org}.
 \begin{itemize}
     \item a \texttt{frame title} can be added in two manners: 
     \begin{itemize} 
-       \item directly to the frame after the \verb|\begin{frame}| as \verb|\begin{frame}{Frame title}|.
+       \item directly to the frame after the \verb|\begin{frame}| as \verb|\begin{frame}[t]{Frame title}|.
        \item using the \verb|\frametitle{Frame title}| option after \verb|\begin{frame}|.
     \end{itemize}
     \item a \texttt{frame subtitle} can be added in two manners: 
     \begin{itemize} 
-       \item directly to the frame after the \verb|\begin{frame}{Frame title}| as \verb|\begin{frame}{Frame title}{Frame subtitle}|.
+       \item directly to the frame after the \verb|\begin{frame}[t]{Frame title}| as \verb|\begin{frame}[t]{Frame title}{Frame subtitle}|.
        \item using the \verb|\framesubtitle{Frame subtitle}| option after \verb|\begin{frame}| and usually after the frame title.
     \end{itemize}
 \end{itemize}
@@ -74,7 +74,7 @@ Hyperlinks or URLs: \url{https://example.org}.
 
 %========================
 \section{Two-column layout}
-\begin{frame}{Two-column layout}
+\begin{frame}[t]{Two-column layout}
 \begin{columns}[T,onlytextwidth]
   \column{0.52\textwidth}
   \textbf{Left column}
@@ -95,7 +95,7 @@ Hyperlinks or URLs: \url{https://example.org}.
 
 %========================
 \section{Text + figure side-by-side}
-\begin{frame}{Text with figure}
+\begin{frame}[t]{Text with figure}
 \begin{columns}[T,onlytextwidth]
   \column{0.58\textwidth}
   \textbf{Guidelines}
@@ -108,20 +108,19 @@ Hyperlinks or URLs: \url{https://example.org}.
   Example sentence with units using \texttt{siunitx}: ``The device length was \SI{120}{mm} and the sampling rate was \SI{10}{kHz}.''
 
   \column{0.38\textwidth}
-  \begin{center}
-    % Replace with your image
-    % \includegraphics[width=\linewidth]{path/to/image}
-    \begin{tikzpicture}
-      \draw[NMBUAccent3,dashed,fill=NMBUAccent3!12] (0,0) rectangle (5,4);
-      \node at (2.5,2) {Image Placeholder};
-    \end{tikzpicture}
-  \end{center}
+  \begin{figure}
+    \centering
+    % \includegraphics[width=.9\linewidth]{path/to/figure}
+    \setlength{\fboxsep}{0pt}%
+    \fbox{\rule{0pt}{3cm}\rule{.9\linewidth}{0pt}}
+    \caption{Figure placeholder.}
+  \end{figure}
 \end{columns}
 \end{frame}
 
 %========================
 \section{Blocks and emphasis}
-\begin{frame}{Blocks and emphasis}
+\begin{frame}[t]{Blocks and emphasis}
 \begin{block}{Key point}
 Use a standard block for definitions, main ideas, or neutral emphasis.
 \end{block}
@@ -137,7 +136,7 @@ Use an example block for worked examples, case studies, or brief demonstrations.
 
 %========================
 \section{Math and units}
-\begin{frame}{Equations and units}
+\begin{frame}[t]{Equations and units}
 \begin{align}
   f(x) &= ax^2 + bx + c, \\
   x_{1,2} &= \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}. \label{eq:quadratic}
@@ -147,7 +146,7 @@ Use \texttt{siunitx} for consistent numbers and units: \SI{3.1416}{rad}, \SI{9.8
 
 %========================
 \section{Tables}
-\begin{frame}{Compact table}
+\begin{frame}[t]{Compact table}
 \begin{table}
   \centering
   \small
@@ -166,7 +165,7 @@ Use \texttt{siunitx} for consistent numbers and units: \SI{3.1416}{rad}, \SI{9.8
 
 %========================
 \section{Lists}
-\begin{frame}{Lists}
+\begin{frame}[t]{Lists}
 \begin{columns}[T,onlytextwidth]
   \column{0.48\textwidth}
   \textbf{Bulleted list}
@@ -188,19 +187,19 @@ Use \texttt{siunitx} for consistent numbers and units: \SI{3.1416}{rad}, \SI{9.8
 
 %========================
 \section{Figure slide}
-\begin{frame}{Full-width figure}
+\begin{frame}[t]{Full-width figure}
 \begin{figure}
   \centering
   % \includegraphics[width=.9\linewidth]{path/to/figure}
   \setlength{\fboxsep}{0pt}%
-  \fbox{\rule{0pt}{5cm}\rule{.9\linewidth}{0pt}}
+  \fbox{\rule{0pt}{4cm}\rule{.9\linewidth}{0pt}}
   \caption{Insert a high-resolution figure with a concise caption.}
 \end{figure}
 \end{frame}
 
 %========================
 \section{Quotations}
-\begin{frame}{Quotation}
+\begin{frame}[t]{Quotation}
 \begin{quote}
 “Concise quotations can provide context or motivation. Keep them short and readable.”
 \end{quote}
@@ -208,7 +207,7 @@ Use \texttt{siunitx} for consistent numbers and units: \SI{3.1416}{rad}, \SI{9.8
 
 %========================
 \section{Wrap-up}
-\begin{frame}{Takeaways}
+\begin{frame}[t]{Takeaways}
 \begin{itemize}
   \item One message per slide; visuals over text walls.
   \item Use blocks for emphasis; keep tables compact.
@@ -224,7 +223,7 @@ Use \texttt{siunitx} for consistent numbers and units: \SI{3.1416}{rad}, \SI{9.8
 %========================
 
 \section{Backup}
-\begin{frame}{Extra slides}
+\begin{frame}[t]{Extra slides}
 Add additional material here for Q\&A or reference.
 \end{frame}
 

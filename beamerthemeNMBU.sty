@@ -1,13 +1,44 @@
 % NMBU Beamer style
-% 
-% (c) Leonardo Rydin Gorjão 2025
 %
-%% This style can be redistributed and/or modified freely.
+% (c) Leonardo Rydin Gorjão 2025--2026
+%
+% This style can be redistributed and/or modified freely.
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{beamerthemeNMBU}[2025/10/12 v0.2 NMBU Beamer theme]
+\ProvidesPackage{beamerthemeNMBU}[2026/06/23 v0.3.0 NMBU Beamer theme]
 
-\RequirePackage{xcolor}
+% This file defines a Beamer presentation theme for the Norwegian University
+% of Life Sciences (NMBU).
+% It provides:
+%   - NMBU colour definitions and hyperlink styling;
+%   - language-dependent institute and page labels;
+%   - font selection for XeLaTeX/LuaLaTeX, with a pdfLaTeX fallback;
+%   - frame title, title page, footline, list, block, and caption styling;
+%   - a per-frame accent-colour option: [framecolor=<xcolor name>];
+%   - per-frame logo controls: [leftlogo], [rightlogo], [nologo];
+%   - per-frame footline control: [footline] and [nofootline];
+%   - simple filename-based additional logos for title and regular frames;
+%   - a custom outline list environment: nmbuoutline;
+%   - embedded NMBU logo drawing at the end of the file.
+%
+% Typical use in a presentation:
+%
+%   \documentclass[10pt,aspectratio=169]{beamer}
+%   \usetheme[
+%     lang=en,
+%     font=arial,
+%     elevatedtitles=true,
+%     serifmath=true,
+%     tightlists=true
+%   ]{NMBU}
+%
+% Compile with XeLaTeX or LuaLaTeX for Arial/Calibri/Carlito system fonts.
+% With pdfLaTeX, the theme falls back to Helvetica when font is not set to none.
+
+\makeatletter
+
+\RequirePackage{kvoptions}
+\RequirePackage[dvipsnames]{xcolor}
 \RequirePackage{graphicx}
 \RequirePackage{etoolbox}
 \RequirePackage{ifxetex}
@@ -18,107 +49,165 @@
 \usetikzlibrary{intersections}
 \usetikzlibrary{positioning}
 
-\SetupKeyvalOptions{family=NMBU, prefix=NMBU@}
-\DeclareStringOption[arial]{font}     % arial|calibri|none (none = don't touch fonts)
+% Options are passed by Beamer through \usetheme[...]{NMBU}; internally this
+% is loaded as a package option list, which kvoptions processes here.
+%
+% font:
+%   arial   : use Arial via fontspec under XeLaTeX/LuaLaTeX
+%   calibri : use Calibri via fontspec under XeLaTeX/LuaLaTeX
+%   carlito : use Carlito via fontspec under XeLaTeX/LuaLaTeX
+%   none    : do not alter the document fonts
+%
+% elevatedtitles:
+%   true  : compact title strip, leaving more vertical space on the slide
+%   false : taller title strip
+%
+% serifmath:
+%   true  : keep mathematics in a serif math font
+%   false : use Beamer's default sans-style math behaviour
+%
+% tightlists:
+%   true  : slightly tighter standard itemize lists
+%   false : leave Beamer defaults mostly untouched
+%
+% lang:
+%   en : English labels
+%   bm : Norwegian Bokmål labels
+%   nn : Norwegian Nynorsk labels
+
+\SetupKeyvalOptions{family=NMBU,prefix=NMBU@}
+
+\DeclareStringOption[arial]{font}
 \DeclareBoolOption[true]{elevatedtitles}
 \DeclareBoolOption[true]{serifmath}
-\DeclareBoolOption[true]{tightlists}   % slightly tighter item spacing
-% Three language switch: en (English), bm (Bokmål), nn (Nynorsk)
+\DeclareBoolOption[true]{tightlists}
 \DeclareStringOption[en]{lang}
+
 \ProcessKeyvalOptions*
 
-% Mapping to babel/polyglossia language tags 
 \def\NMBU@babel@en{english}
-\def\NMBU@babel@bm{norwegian} % Bokmål
+\def\NMBU@babel@bm{norwegian}
 \def\NMBU@babel@nn{nynorsk}
-\newcommand*\NMBU@babelname{\csname NMBU@babel@\NMBU@lang\endcsname}
 
-% Load babel
-\expandafter\RequirePackage\expandafter[\NMBU@babelname]{babel}
-
-% Define institutional name for the three languages
 \providecommand\NMBU@inst@en{Norwegian University of Life Sciences}
 \providecommand\NMBU@inst@bm{Norges miljø- og biovitenskapelige universitet}
 \providecommand\NMBU@inst@nn{Noregs miljø- og biovitskaplege universitet}
 
+\providecommand\NMBU@page@en{page}
+\providecommand\NMBU@page@bm{side}
+\providecommand\NMBU@page@nn{side}
+
+\@ifundefined{NMBU@babel@\NMBU@lang}{%
+  \PackageWarning{beamerthemeNMBU}{Unknown language '\NMBU@lang'. Falling back to English}%
+  \def\NMBU@lang{en}%
+}{}
+
+\newcommand*\NMBU@babelname{\csname NMBU@babel@\NMBU@lang\endcsname}
 \newcommand*\NMBU@InstituteName{\csname NMBU@inst@\NMBU@lang\endcsname}
+\newcommand*\NMBU@PageName{\csname NMBU@page@\NMBU@lang\endcsname}
+
+\expandafter\RequirePackage\expandafter[\NMBU@babelname]{babel}
 \institute{\NMBU@InstituteName}
 
+% NMBUPrimary is the main green/teal accent used for titles, logos, and the
+% footline. The colour names are intentionally stable so user documents can
+% rely on them.
 
-% Colour definitions. More should be added.
-\definecolor{NMBUblack}{HTML}{000000}    % Black 
-\definecolor{NMBUwhite}{HTML}{FFFFFF}    % White 
-\definecolor{NMBUPrimary}{HTML}{009D7F}  % accent1 (green/teal)
-\definecolor{NMBUAccent2}{HTML}{E7E3D1}  % accent2 (amber)
-\definecolor{NMBUAccent3}{HTML}{F6F6EE}  % accent3 (slate)
-% I note here that the official green of NMBU is the {RGB}{0,133,113}, but for some reason, all the templates we use use a different green. Beats me.
+\definecolor{NMBUblack}{HTML}{000000}
+\definecolor{NMBUwhite}{HTML}{FFFFFF}
 
-% Hyperlinks related packages
+\definecolor{NMBUPrimary}{HTML}{009D7F}
+\definecolor{NMBUAccent2}{HTML}{E7E3D1}
+\definecolor{NMBUAccent3}{HTML}{F6F6EE}
+\definecolor{NMBUwarmgrey}{HTML}{E8E3DC}
+\definecolor{NMBUgreenish}{HTML}{A1B7AC}
+\definecolor{NMBUlightblue}{HTML}{ACC5E0}
+
 \RequirePackage{hyperref}
-\hypersetup{colorlinks=true,citecolor=NMBUPrimary}
+
+\hypersetup{
+  colorlinks=true,
+  citecolor=NMBUPrimary,
+  linkcolor=NMBUPrimary,
+  urlcolor=NMBUPrimary
+}
+
 \urlstyle{same}
 \DeclareUrlCommand\url{\color{NMBUPrimary}}
 
-% Font setup (Arial by default as per NMBU standard)
-\newif\ifnmbu@fontspec
-\ifxetex\nmbu@fontspectrue\fi
-\ifluatex\nmbu@fontspectrue\fi
+\newif\ifNMBU@usefontspec
+\NMBU@usefontspecfalse
 
-\ifstrequal{\NMBU@font}{none}{\nmbu@fontspecfalse}{}%
+\ifxetex
+  \NMBU@usefontspectrue
+\fi
+\ifluatex
+  \NMBU@usefontspectrue
+\fi
 
-\ifnmbu@fontspec
+\ifdefstring{\NMBU@font}{none}{%
+  \NMBU@usefontspecfalse
+}{}
+
+\ifNMBU@usefontspec
   \RequirePackage{fontspec}
-  \ifstrequal{\NMBU@font}{calibri}{%
-    \setsansfont{Calibri}
-    \setmainfont{Calibri}
+
+  \newcommand*\NMBU@setfontwithfallback[2]{%
+    \IfFontExistsTF{#1}{%
+      \setsansfont{#1}%
+      \setmainfont{#1}%
+    }{%
+      \PackageWarning{beamerthemeNMBU}{Font '#1' not found. Falling back to '#2'}%
+      \IfFontExistsTF{#2}{%
+        \setsansfont{#2}%
+        \setmainfont{#2}%
+      }{%
+        \PackageWarning{beamerthemeNMBU}{Fallback font '#2' not found. Falling back to TeX Gyre Heros}%
+        \setsansfont{TeX Gyre Heros}%
+        \setmainfont{TeX Gyre Heros}%
+      }%
+    }%
+  }
+
+  \ifdefstring{\NMBU@font}{calibri}{%
+    \NMBU@setfontwithfallback{Calibri}{Carlito}%
   }{%
-    % default Arial
-    \setsansfont{Arial}
-    \setmainfont{Arial}
+    \ifdefstring{\NMBU@font}{carlito}{%
+      \NMBU@setfontwithfallback{Carlito}{TeX Gyre Heros}%
+    }{%
+      \ifdefstring{\NMBU@font}{arial}{%
+        \NMBU@setfontwithfallback{Arial}{Carlito}%
+      }{%
+        \PackageWarning{beamerthemeNMBU}{Unknown font option '\NMBU@font'. Falling back to Arial/Carlito}%
+        \NMBU@setfontwithfallback{Arial}{Carlito}%
+      }%
+    }%
   }%
 \else
-  % pdfLaTeX fallback: use Helvetica for a similar look
-  \RequirePackage[scaled=0.92]{helvet}
-  \renewcommand{\familydefault}{\sfdefault}
+  \ifdefstring{\NMBU@font}{none}{%
+    % Leave all font choices to the document.
+  }{%
+    \RequirePackage[scaled=0.8]{helvet}
+    \renewcommand{\familydefault}{\sfdefault}
+  }%
 \fi
 
-\def\elevatedtitleheight{6.2ex}
-\ifNMBU@elevatedtitles 
-    \renewcommand\elevatedtitleheight{3.0ex}
+\ifNMBU@serifmath
+  \usefonttheme[onlymath]{serif}
 \fi
 
-\ifNMBU@serifmath 
-    \usefonttheme[onlymath]{serif}
+\newcommand*\NMBU@frametitleheight{10ex}
+\ifNMBU@elevatedtitles
+  \renewcommand*\NMBU@frametitleheight{3.0ex}
 \fi
 
-\RequirePackage{lmodern}
-
-% Arial font with XeLaTeX or LuaLaTeX
-\RequirePackage{fontspec}
-\setsansfont{Arial}
-\setmainfont{Arial}
-
-% Shorter caption spacing
 \setlength{\abovecaptionskip}{5pt plus 3pt minus 2pt}
 
-% Core beamer palette & typography
 \mode<presentation>
 
-% Base text & structure
 \setbeamercolor{normal text}{fg=NMBUblack,bg=NMBUwhite}
 \setbeamercolor{structure}{fg=NMBUPrimary}
 \setbeamercolor{alerted text}{fg=NMBUAccent2}
-
-% Frame title bar (colored) and title colors
-\setbeamercolor{frametitle}{fg=NMBUPrimary,bg=}
-\setbeamertemplate{frametitle}{%
-    \nointerlineskip
-    \begin{beamercolorbox}[wd=\paperwidth,ht=\elevatedtitleheight,dp=1.6ex,leftskip=10mm,rightskip=10mm]{frametitle}
-      \usebeamerfont{frametitle}\insertframetitle\\[0.1em]
-      \usebeamerfont{framesubtitle}\insertframesubtitle
-    \end{beamercolorbox}%
-}
-
 
 \setbeamerfont{frametitle}{size=\Large}
 \setbeamerfont{framesubtitle}{size=\normalsize}
@@ -128,25 +217,24 @@
 \setbeamerfont{author}{size=\large}
 \setbeamerfont{institute}{size=\large}
 \setbeamerfont{date}{size=\large}
+
 \setbeamerfont{block title}{size=\normalsize}
 \setbeamerfont{footnote}{size=\scriptsize}
 
-% Margins & vertical rhythm
-\setbeamersize{text margin left=10mm, text margin right=10mm}
+\setbeamersize{text margin left=9mm,text margin right=9mm}
 \linespread{1.06}
 \setlength{\parskip}{0.28\baselineskip}
 
-% Lists
 \setbeamercolor{itemize item}{fg=NMBUPrimary}
-\setbeamercolor{itemize subitem}{fg=NMBUAccent3}
+\setbeamercolor{itemize subitem}{fg=NMBUAccent2}
 \setbeamertemplate{itemize item}{\raise0.6pt\hbox{\large\textbullet}}
 \setbeamertemplate{itemize subitem}{\textendash}
+
 \ifNMBU@tightlists
   \setlength{\leftmargini}{1.4em}
   \setlength{\itemsep}{0.25\baselineskip}
 \fi
 
-% Blocks (use amber/secondary accent for titles, light background for body)
 \setbeamertemplate{blocks}[rounded][shadow=false]
 \setbeamercolor{block title}{fg=NMBUblack,bg=NMBUAccent2}
 \setbeamercolor{block body}{fg=NMBUblack,bg=NMBUAccent3}
@@ -155,55 +243,480 @@
 \setbeamercolor{block title alerted}{fg=NMBUblack,bg=NMBUAccent2}
 \setbeamercolor{block body alerted}{fg=NMBUblack,bg=NMBUAccent3}
 
-
-% Example/theorem colors (cooler palette)
 \setbeamercolor{author in head/foot}{fg=NMBUPrimary,bg=}
 \setbeamercolor{date in head/foot}{fg=NMBUPrimary,bg=}
-\setbeamercolor{nmbu foot rule}{fg=NMBUPrimary,bg=}
+\setbeamercolor{NMBU foot rule}{fg=NMBUPrimary,bg=}
 
 \setbeamertemplate{navigation symbols}{}
 \setbeamertemplate{caption}[numbered]
 
-% Footline: rule + page (left) and NMBU (right)
+\newcommand*\NMBU@frameaccentdefault{NMBUPrimary}
+\def\NMBU@frameaccent{\NMBU@frameaccentdefault}
+
+% Valid logo-side values are 'left' and 'right'. The default is 'right' to
+% preserve the earlier NMBU theme layout.
+\def\NMBU@logoside{right}
+
+\newif\ifNMBU@nofootline
+\newif\ifNMBU@nologo
+\NMBU@nofootlinefalse
+\NMBU@nologofalse
+
+\define@key{beamerframe}{framecolor}{%
+  \def\NMBU@frameaccent{#1}%
+}
+
+\define@key{beamerframe}{footline}[true]{%
+  \ifdefstring{#1}{false}{%
+    \NMBU@nofootlinetrue
+  }{%
+    \NMBU@nofootlinefalse
+  }%
+}
+
+\define@key{beamerframe}{nofootline}[true]{%
+  \ifdefstring{#1}{false}{%
+    \NMBU@nofootlinefalse
+  }{%
+    \NMBU@nofootlinetrue
+  }%
+}
+
+\define@key{beamerframe}{leftlogo}[true]{%
+  \ifdefstring{#1}{false}{%
+    \def\NMBU@logoside{right}%
+  }{%
+    \def\NMBU@logoside{left}%
+    \NMBU@nologofalse
+  }%
+}
+
+\define@key{beamerframe}{rightlogo}[true]{%
+  \ifdefstring{#1}{false}{%
+    \def\NMBU@logoside{left}%
+  }{%
+    \def\NMBU@logoside{right}%
+    \NMBU@nologofalse
+  }%
+}
+
+\define@key{beamerframe}{nologo}[true]{%
+  \ifdefstring{#1}{false}{%
+    \NMBU@nologofalse
+  }{%
+    \NMBU@nologotrue
+  }%
+}
+
+\AtBeginDocument{%
+  \pretocmd{\beamer@@@@frame}{%
+    \def\NMBU@frameaccent{\NMBU@frameaccentdefault}%
+    \def\NMBU@logoside{right}%
+    \NMBU@nofootlinefalse
+    \NMBU@nologofalse
+  }{}{%
+    \PackageWarning{beamerthemeNMBU}{Could not patch Beamer frame initialisation; frame options may persist across frames}%
+  }%
+}
+
+\setbeamercolor{frametitle}{fg=,bg=}
+
+\setbeamertemplate{frametitle}{%
+  \nointerlineskip
+  \begin{beamercolorbox}[
+    wd=\paperwidth,
+    ht=\NMBU@frametitleheight,
+    dp=1.6ex,
+    leftskip=9mm,
+    rightskip=9mm
+  ]{frametitle}
+    \usebeamerfont{frametitle}%
+    \textcolor{\NMBU@frameaccent}{\insertframetitle}%
+    \\[0.1em]%
+    \usebeamerfont{framesubtitle}\insertframesubtitle
+  \end{beamercolorbox}%
+}
+
+\newcommand*\NMBU@titlelogocode{}
+\newcommand*\NMBU@framelogocode{}
+\newcommand*\NMBU@titlelogorow{}
+\newcommand*\NMBU@framelogorow{}
+
+\newlength{\NMBUtitlelogogap}
+\newlength{\NMBUframelogogap}
+\setlength{\NMBUtitlelogogap}{0.45cm}
+\setlength{\NMBUframelogogap}{0.35cm}
+
+\newcommand*\NMBUtitlelogos[1]{%
+  \gdef\NMBU@titlelogocode{#1}%
+}
+
+\newcommand*\NMBUframelogos[1]{%
+  \gdef\NMBU@framelogocode{#1}%
+}
+
+\newcommand*\NMBUcleartitlelogos{%
+  \global\let\NMBU@titlelogocode\@empty
+  \global\let\NMBU@titlelogorow\@empty
+}
+
+\newcommand*\NMBUclearframelogos{%
+  \global\let\NMBU@framelogocode\@empty
+  \global\let\NMBU@framelogorow\@empty
+}
+
+\newcommand*\NMBU@appendtitlelogofile[2]{%
+  \ifx\NMBU@titlelogorow\@empty
+    \gappto\NMBU@titlelogorow{\includegraphics[#1]{#2}}%
+  \else
+    \gappto\NMBU@titlelogorow{\hspace{\NMBUtitlelogogap}\includegraphics[#1]{#2}}%
+  \fi
+}
+
+\newcommand*\NMBU@appendframelogofile[2]{%
+  \ifx\NMBU@framelogorow\@empty
+    \gappto\NMBU@framelogorow{\includegraphics[#1]{#2}}%
+  \else
+    \gappto\NMBU@framelogorow{\hspace{\NMBUframelogogap}\includegraphics[#1]{#2}}%
+  \fi
+}
+
+\newcommand*\NMBUaddtitlelogo[2][height=0.65cm]{%
+  \NMBU@appendtitlelogofile{#1}{#2}%
+}
+
+\newcommand*\NMBUaddframelogo[2][height=0.38cm]{%
+  \NMBU@appendframelogofile{#1}{#2}%
+}
+
+\newcommand*\NMBUaddtitlelogonode[3][]{%
+  \gappto\NMBU@titlelogocode{%
+    \node[inner sep=0pt,#1] at #2 {#3};%
+  }%
+}
+
+\newcommand*\NMBUaddframelogonode[3][]{%
+  \gappto\NMBU@framelogocode{%
+    \node[inner sep=0pt,#1] at #2 {#3};%
+  }%
+}
+
+\newcommand*\NMBU@drawtitlelogorow{%
+  \ifx\NMBU@titlelogorow\@empty
+    % No extra title-page logo files supplied.
+  \else
+    \node[anchor=north east,inner sep=0pt]
+      at ($(current page.north east) + (-2.15,-0.50)$)
+      {\NMBU@titlelogorow};%
+  \fi
+}
+
+\newcommand*\NMBU@drawleftframelogorow{%
+  \ifx\NMBU@framelogorow\@empty
+    % No extra regular-frame logo files supplied.
+  \else
+    \node[anchor=north west,inner sep=0pt]
+      at ($(current page.north west) + (2.45,-0.50)$)
+      {\NMBU@framelogorow};%
+  \fi
+}
+
+\newcommand*\NMBU@drawrightframelogorow{%
+  \ifx\NMBU@framelogorow\@empty
+    % No extra regular-frame logo files supplied.
+  \else
+    \node[anchor=north east,inner sep=0pt]
+      at ($(current page.north east) + (-2.45,-0.50)$)
+      {\NMBU@framelogorow};%
+  \fi
+}
+
+% --- Logo layer ------------------------------------------------------------
+
+\newcommand*\NMBU@drawleftlogo{%
+  \node[anchor=north west,inner sep=0pt]
+    at ($(current page.north west) + (0.92,-0.50)$)
+    {\resizebox{1.0cm}{!}{\nmbulogo{\NMBU@frameaccent}}};%
+}
+
+\newcommand*\NMBU@drawrightlogo{%
+  \node[anchor=north east,inner sep=0pt]
+    at ($(current page.north east) + (-0.85,-0.50)$)
+    {\resizebox{1.0cm}{!}{\nmbulogo{\NMBU@frameaccent}}};%
+}
+
+\newcommand*\NMBU@drawlogo{%
+  \ifNMBU@nologo
+    % Logo layer deliberately suppressed.
+  \else
+    \ifdefstring{\NMBU@logoside}{left}{%
+      \NMBU@drawleftlogo
+      \NMBU@drawleftframelogorow
+    }{%
+      \NMBU@drawrightlogo
+      \NMBU@drawrightframelogorow
+    }%
+    \NMBU@framelogocode
+  \fi
+}
+
+\newcommand*\NMBU@drawfootline{%
+  \ifNMBU@nofootline
+    % Footline deliberately suppressed; logo is handled independently.
+  \else
+    \draw[line width=0.10mm,\NMBU@frameaccent]
+      ($(current page.south west) + (0.9,0.82)$) -- ($(current page.south east) + (-0.9,0.82)$);
+    \node[anchor=north west,text=\NMBU@frameaccent,inner sep=0pt,align=left]
+      at ($(current page.south west) + (0.9,0.72)$)
+      {\fontsize{7pt}{8pt}\selectfont\insertframenumber\par};
+    \node[anchor=north east,text=\NMBU@frameaccent,inner sep=0pt,align=right]
+      at ($(current page.south east) + (-0.9,0.72)$)
+      {\fontsize{7pt}{8pt}\selectfont\insertinstitute\par};
+  \fi
+}
+
 \setbeamertemplate{footline}{%
-\begin{tikzpicture}[overlay, remember picture]
-    \node[below right, inner sep=0pt] at ($(current page.north east)+(-2, -0.25)$) {\enlogo{NMBUPrimary}};
-    \draw[line width=0.12mm, NMBUPrimary, inner sep=0pt] ($(current page.south west)+(0.9, 0.8)$) -- ($(current page.south east)+(-0.9, 0.8)$);
-    \node[below right, NMBUPrimary, inner sep=0pt] at ($(current page.south west)+(0.9, 0.7)$) {\fontsize{5.5pt}{6.5pt}\selectfont\insertframenumber\par};
-    \node[below left, NMBUPrimary, inner sep=0pt] at ($(current page.south east)+(-0.9, 0.7)$) {\fontsize{5.7pt}{6.5pt}\selectfont\insertinstitute\par};
-\end{tikzpicture}
+  \begin{tikzpicture}[overlay,remember picture]
+    \NMBU@drawlogo
+    \NMBU@drawfootline
+  \end{tikzpicture}%
 }
 
-% Title page with primary background, white text
+\addtobeamertemplate{footline}{}{\vspace{0.75cm}}
+
 \setbeamercolor{title}{fg=NMBUwhite,bg=NMBUPrimary}
-\defbeamertemplate*{title page}{nmbu}[1][]{%
-\begin{tikzpicture}[overlay, remember picture]
-    \fill [NMBUPrimary, inner sep=0pt] ($(current page.north west)$) -- ($(current page.north east)$) -- ($(current page.south east)$) -- ($(current page.south west)$) -- ($(current page.north west)$);
-    \node[below right, NMBUPrimary, inner sep=0pt] at ($(current page.north east)+(-2, -0.25)$) {\resizebox{0.1cm}{!}{\enlogo{NMBUwhite}}};
-    \node[right, NMBUwhite, inner sep=0pt] at ($(current page.west) + (0.9,0.3)$) {\fontsize{23pt}{26pt}\selectfont\inserttitle\par};
-    \node[right, NMBUwhite, inner sep=0pt] at ($(current page.west) + (0.9,-0.5)$) {\fontsize{12pt}{14pt}\selectfont\insertauthor\par};
-    \node[right, NMBUwhite, inner sep=0pt] at ($(current page.west) + (0.9,-1.7)$) {\fontsize{12pt}{14pt}\selectfont\insertsubtitle\par};
-    \node[right, NMBUwhite, inner sep=0pt] at ($(current page.west) + (0.9,-2.3)$) {\fontsize{12pt}{14pt}\selectfont\insertdate\par};
-    \draw[line width=0.12mm, NMBUwhite, inner sep=0pt] ($(current page.south west)+(0.9, 0.8)$) -- ($(current page.south east)+(-0.9, 0.8)$);
-    \node[below left, NMBUwhite, inner sep=0pt] at ($(current page.south east)+(-0.9, 0.7)$) {\fontsize{5.7pt}{6.5pt}\selectfont\insertinstitute\par};
-\end{tikzpicture}
+
+\defbeamertemplate*{title page}{NMBU}[1][]{%
+  \begin{tikzpicture}[overlay,remember picture]
+    \fill[NMBUPrimary]
+      (current page.north west) rectangle (current page.south east);
+
+    \node[anchor=north east,inner sep=0pt]
+      at ($(current page.north east) + (-0.8,-0.50)$)
+      {\resizebox{1.0cm}{!}{\nmbulogo{NMBUwhite}}};
+
+    \NMBU@drawtitlelogorow
+    \NMBU@titlelogocode
+
+    \node[
+      anchor=west,
+      NMBUwhite,
+      inner sep=0pt,
+      align=left,
+      text width=12.0cm
+    ] (T) at ($(current page.west) + (0.8,0.30)$)
+      {%
+        \usebeamerfont{title}%
+        \fontsize{23pt}{26pt}\selectfont
+        \raggedright\inserttitle\par
+      };
+
+    \node[
+      anchor=north west,
+      NMBUwhite,
+      inner sep=0pt,
+      align=left,
+      text width=12.0cm
+    ] (A) at ($(current page.west) + (0.8,-0.50)$)
+      {\fontsize{12pt}{14pt}\selectfont\insertauthor\par};
+
+    \ifx\insertsubtitle\@empty\else
+      \node[
+        anchor=north west,
+        NMBUwhite,
+        inner sep=0pt,
+        align=left,
+        text width=12.0cm
+      ] (ST) at ($(current page.west) + (0.9,-1.70)$)
+        {\fontsize{12pt}{14pt}\selectfont\insertsubtitle\par};
+    \fi
+
+    \node[
+      anchor=north west,
+      NMBUwhite,
+      inner sep=0pt,
+      align=left,
+      text width=12.0cm
+    ] (D) at ($(current page.west) + (0.9,-2.30)$)
+      {\fontsize{12pt}{14pt}\selectfont\insertdate\par};
+
+    \draw[line width=0.10mm,NMBUwhite]
+      ($(current page.south west) + (0.9,0.82)$)
+      --
+      ($(current page.south east) + (-0.9,0.82)$);
+
+    \node[anchor=north east,NMBUwhite,inner sep=0pt,align=right]
+      at ($(current page.south east) + (-0.9,0.72)$)
+      {\fontsize{7pt}{8pt}\selectfont\insertinstitute\par};
+  \end{tikzpicture}%
 }
 
-\setbeamertemplate{title page}[nmbu]
+\setbeamertemplate{title page}[NMBU]
 
 \renewcommand\footnoterule{}
 \setbeamertemplate{footnote}{%
-% \begin{tikzpicture}[overlay, remember picture]
-%     \node[below left, inner sep=0pt] at ($(current page.south east)+(-0.9, 1.15)$) {{\tiny\hbox to 1.8em{\hfil\insertfootnotemark}\insertfootnotetext\par}};
-% \end{tikzpicture}
-  \raggedleft%\raggedright
-  \usebeamercolor{footnote}\tiny\hfil\insertfootnotemark \insertfootnotetext\par%
+  \raggedleft
+  \usebeamercolor{footnote}\tiny\hfil\insertfootnotemark\ \insertfootnotetext\par%
 }
 
-\addtobeamertemplate{footline}{}{\vspace{0.75cm}} 
+% A custom numbered outline list with:
+%   - accent-coloured numbers;
+%   - a vertical accent rule between numbers and text;
+%   - bold item titles;
+%   - smaller grey detail text.
+%
+% Basic usage:
+%
+%   \begin{nmbuoutline}
+%     \item<1-> First subject
+%     \itemdetails<1-> First subject details
+%
+%     \item<2-> Second subject
+%     \itemdetails<3-> Second subject details, appearing later
+%   \end{nmbuoutline}
+%
+% Optional colour override:
+%
+%   \begin{nmbuoutline}[NMBUAccent2]
+%     ...
+%   \end{nmbuoutline}
+%
+% By default, the outline accent follows the current frame accent.
 
-\newcommand{\enlogo}[1]{%
-\begin{tikzpicture}[scale=2,remember picture,overlay]% 
+\newcounter{nmbuoutlineitem}
+\newcounter{nmbuoutlineblock}
+
+\newlength{\NMBUoutlineNumberWidth}
+\newlength{\NMBUoutlineNumberSep}
+\newlength{\NMBUoutlineRuleWidth}
+\newlength{\NMBUoutlineTextSep}
+\newlength{\NMBUoutlineRuleX}
+\newlength{\NMBUoutlineLeftMargin}
+
+\newlength{\NMBUoutlineItemSep}
+\newlength{\NMBUoutlineTopAdjust}
+\newlength{\NMBUoutlineBottomAdjust}
+\newlength{\NMBUoutlineNumberRaise}
+\newlength{\NMBUoutlineDetailSkip}
+
+\setlength{\NMBUoutlineNumberWidth}{0.75cm}
+\setlength{\NMBUoutlineNumberSep}{0.45cm}
+\setlength{\NMBUoutlineRuleWidth}{0.55pt}
+\setlength{\NMBUoutlineTextSep}{0.55cm}
+
+\setlength{\NMBUoutlineItemSep}{0.32cm}
+\setlength{\NMBUoutlineTopAdjust}{0.18cm}
+\setlength{\NMBUoutlineBottomAdjust}{-0.35cm}
+\setlength{\NMBUoutlineNumberRaise}{-0.8em}
+\setlength{\NMBUoutlineDetailSkip}{-0.25em}
+
+\newcommand{\NMBUoutlineNumberFont}{%
+  \fontsize{16pt}{18pt}\bfseries\selectfont%
+}
+
+\newcommand{\NMBUoutlineTitleFont}{%
+  \fontsize{12pt}{14pt}\bfseries\selectfont%
+}
+
+\newcommand{\NMBUoutlineDetailFont}{%
+  \fontsize{10pt}{12pt}\normalfont\selectfont%
+}
+
+\newcommand{\NMBUoutlineTitleColour}{NMBUblack}
+\newcommand{\NMBUoutlineDetailColour}{black!55}
+
+\newenvironment{nmbuoutline}[1][\NMBU@frameaccent]{%
+  \par
+  \begingroup
+  \stepcounter{nmbuoutlineblock}%
+  \setcounter{nmbuoutlineitem}{0}%
+  \colorlet{NMBUoutlineAccent}{#1}%
+  \setlength{\NMBUoutlineRuleX}{%
+    \dimexpr\NMBUoutlineNumberWidth+\NMBUoutlineNumberSep\relax%
+  }%
+  \setlength{\NMBUoutlineLeftMargin}{%
+    \dimexpr
+      \NMBUoutlineNumberWidth
+      + \NMBUoutlineNumberSep
+      + \NMBUoutlineRuleWidth
+      + \NMBUoutlineTextSep
+    \relax%
+  }%
+  \tikz[remember picture,overlay]
+    \coordinate (nmbuoutline-top-\thenmbuoutlineblock);
+  \begin{list}{}{%
+    \setlength{\labelwidth}{\NMBUoutlineNumberWidth}%
+    \setlength{\labelsep}{%
+      \dimexpr
+        \NMBUoutlineNumberSep
+        + \NMBUoutlineRuleWidth
+        + \NMBUoutlineTextSep
+      \relax%
+    }%
+    \setlength{\leftmargin}{\NMBUoutlineLeftMargin}%
+    \setlength{\rightmargin}{0pt}%
+    \setlength{\topsep}{0pt}%
+    \setlength{\partopsep}{0pt}%
+    \setlength{\parsep}{0pt}%
+    \setlength{\itemsep}{\NMBUoutlineItemSep}%
+  }%
+  \let\NMBUoutlineOldItem\item
+  \renewcommand<>{\item}{%
+    \onslide<1->%
+    \stepcounter{nmbuoutlineitem}%
+    \NMBUoutlineOldItem##1[%
+      \hbox to \NMBUoutlineNumberWidth{%
+        \hfil
+        \raisebox{\NMBUoutlineNumberRaise}{%
+          {\NMBUoutlineNumberFont\color{NMBUoutlineAccent}\arabic{nmbuoutlineitem}}%
+        }%
+      }%
+    ]%
+    \NMBUoutlineTitleFont
+    \color{\NMBUoutlineTitleColour}%
+    \ignorespaces
+  }%
+  \newcommand<>{\NMBUoutlineItemDetails}{%
+    \par
+    \vspace{\NMBUoutlineDetailSkip}%
+    \NMBUoutlineDetailFont
+    \color{\NMBUoutlineDetailColour}%
+    \def\NMBUoutlineOverlaySpec{##1}%
+    \ifx\NMBUoutlineOverlaySpec\@empty
+    \else
+      \onslide##1%
+    \fi
+    \ignorespaces
+  }%
+  \let\itemdetails\NMBUoutlineItemDetails
+}{%
+  \end{list}%
+  \tikz[remember picture,overlay]
+    \coordinate (nmbuoutline-bottom-\thenmbuoutlineblock);
+  \begin{tikzpicture}[remember picture,overlay]
+    \draw[
+      NMBUoutlineAccent,
+      line width=\NMBUoutlineRuleWidth
+    ]
+      ([xshift=\NMBUoutlineRuleX,yshift=-\NMBUoutlineTopAdjust]
+        nmbuoutline-top-\thenmbuoutlineblock)
+      --
+      ([xshift=\NMBUoutlineRuleX,yshift=-\NMBUoutlineBottomAdjust]
+        nmbuoutline-bottom-\thenmbuoutlineblock);
+  \end{tikzpicture}%
+  \par
+  \endgroup
+}
+
+\newcommand{\nmbulogo}[1]{%
+\begin{tikzpicture}[scale=2,inner sep=0pt,outer sep=0pt]% 
   \path[fill=#1] (0.1418, -0.4077) -- (0.1588, -0.4077) -- (0.1588, -0.4847) -- (0.1421, -0.4847) -- (0.1135, -0.4392) -- (0.1135, -0.4847) -- (0.0963, -0.4847) -- (0.0963, -0.4077) -- (0.1135, -0.4077) -- (0.1418, -0.4524) -- (0.1418, -0.4077) -- cycle(0.2979, -0.4059) -- (0.2979, -0.3289) -- (0.2775, -0.3289) -- (0.2596, -0.3773) -- (0.2418, -0.3289) -- (0.2207, -0.3289) -- (0.2207, -0.4059) -- (0.2376, -0.4059) -- (0.2376, -0.3622) -- (0.2532, -0.4048) -- (0.2656, -0.4048) -- (0.2813, -0.3627) -- (0.2813, -0.4059) -- (0.2979, -0.4059) -- cycle(0.508, -0.1408) -- (0.508, -0.1876).. controls (0.508, -0.1947) and (0.5056, -0.2032) .. (0.4945, -0.2032).. controls (0.4834, -0.2032) and (0.481, -0.1947) .. (0.481, -0.1876) -- (0.481, -0.1408) -- (0.4638, -0.1408) -- (0.4638, -0.1879).. controls (0.4638, -0.2072) and (0.4755, -0.2193) .. (0.4945, -0.2193).. controls (0.5138, -0.2193) and (0.5252, -0.2077) .. (0.5252, -0.1879) -- (0.5252, -0.1408) -- (0.508, -0.1408) -- cycle(0.3937, -0.2574).. controls (0.399, -0.2611) and (0.4022, -0.2672) .. (0.4022, -0.2741).. controls (0.4022, -0.2818) and (0.3993, -0.2879) .. (0.394, -0.2921).. controls (0.3879, -0.2969) and (0.3805, -0.2974) .. (0.3733, -0.2974) -- (0.3424, -0.2974) -- (0.3424, -0.2201) -- (0.3733, -0.2201).. controls (0.381, -0.2201) and (0.3868, -0.2215) .. (0.3913, -0.2244).. controls (0.3971, -0.2281) and (0.4006, -0.235) .. (0.4006, -0.2418).. controls (0.4008, -0.2471) and (0.3987, -0.2537) .. (0.3937, -0.2574) -- cycle(0.3596, -0.25) -- (0.3744, -0.25).. controls (0.3826, -0.25) and (0.3834, -0.2461) .. (0.3834, -0.2429).. controls (0.3834, -0.2381) and (0.3802, -0.2355) .. (0.3741, -0.2355) -- (0.3596, -0.2355) -- (0.3596, -0.25) -- cycle(0.3847, -0.2738).. controls (0.3847, -0.2717) and (0.3847, -0.2651) .. (0.3741, -0.2651) -- (0.3593, -0.2651) -- (0.3593, -0.2815) -- (0.3739, -0.2815).. controls (0.3781, -0.2815) and (0.3847, -0.2805) .. (0.3847, -0.2738) -- cycle(0.4683, -0.3596) -- (0.3765, -0.3596) -- (0.3765, -0.3289) -- (0.3598, -0.3289) -- (0.3598, -0.3596) -- (0.3291, -0.3596) -- (0.3291, -0.3762) -- (0.3598, -0.3762) -- (0.3598, -0.468) -- (0.1961, -0.468) -- (0.1961, -0.4847) -- (0.3702, -0.4847).. controls (0.3736, -0.4847) and (0.3765, -0.4818) .. (0.3765, -0.4784) -- (0.3765, -0.3762) -- (0.4786, -0.3762).. controls (0.4821, -0.3762) and (0.485, -0.3733) .. (0.485, -0.3699) -- (0.485, -0.2471) -- (0.4683, -0.2471) -- (0.4683, -0.3596) -- cycle(0.2503, -0.2974) -- (0.267, -0.2974) -- (0.267, -0.2664) -- (0.2979, -0.2664) -- (0.2979, -0.2498) -- (0.267, -0.2498) -- (0.267, -0.158) -- (0.4265, -0.158) -- (0.4265, -0.1413) -- (0.2566, -0.1413).. controls (0.2532, -0.1413) and (0.2503, -0.1442) .. (0.2503, -0.1476) -- (0.2503, -0.2498) -- (0.1482, -0.2498).. controls (0.1447, -0.2498) and (0.1418, -0.2527) .. (0.1418, -0.2561) -- (0.1418, -0.3762) -- (0.1585, -0.3762) -- (0.1585, -0.2664) -- (0.2503, -0.2664) -- (0.2503, -0.2974) -- cycle;
 \end{tikzpicture}
 }
+
+
+% Compatibility alias for older slides using \enlogo{...} directly.
+\let\enlogo\nmbulogo
+
+\mode<all>
+\makeatother
